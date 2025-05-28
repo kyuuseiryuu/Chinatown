@@ -1,5 +1,3 @@
-import { PlayState } from "./types";
-
 class Player {
   private cards: Set<number> = new Set();
 

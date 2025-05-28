@@ -5,6 +5,7 @@ import { PlayState, PlayStateChangeHandler } from "../lib/types";
 
 const game = new Game();
 const gameStateChangeHandler: PlayStateChangeHandler = (playState: PlayState) => {
+  console.debug("Game state changed to: %s", playState);
   return;
   // switch (playState) {
   //   case PlayState.OVER: {
@@ -49,7 +50,7 @@ const gameStateChangeHandler: PlayStateChangeHandler = (playState: PlayState) =>
 }
 
 game.setGameStateChangeHandler(gameStateChangeHandler);
-const players = new Array(5).fill(0).map((_, index) => new Player());
+const players = new Array(5).fill(0).map(() => new Player());
 
 describe("test Game", () => {
   test("Test game", () => {
