@@ -3,6 +3,7 @@ import { Space, Typography, Button, } from 'antd';
 import { useNavigate } from 'react-router';
 import { useUserState } from '../stores/user';
 import { useRoomState } from "../stores/room";
+import { LogoutOutlined } from '@ant-design/icons';
 
 function App() {
   const navigator = useNavigate();
@@ -21,14 +22,18 @@ function App() {
   }, [navigator]);
 
   const handleCreateRoom = React.useCallback(async () => {
-    const newRoom = await room.createRoom?.(`${username}的房间`);
+    const newRoom = await room.createRoom?.(`${username}的房间`, username);
     console.debug('创建房间:', newRoom);
     navigator(`/rooms/${newRoom?.id}`);
   }, [navigator, room, username]);
 
-  const handleJoinRoom = React.useCallback(() => {
-    navigator('/join-room');
+  const handleGotoRooms = React.useCallback(() => {
+    navigator('/rooms');
   }, [navigator]);
+
+  const handleJoinRoom = React.useCallback(() => {
+
+  }, []);
 
   return (
     <>
@@ -40,8 +45,9 @@ function App() {
         ) : (
           <>
             <Button onClick={handleCreateRoom} size='large' block>创建房间</Button>
-            <Button onClick={handleJoinRoom} size='large' block>加入房间</Button>
-            <Button variant="filled" color="danger" onClick={handleLogout} size='large' block>退出</Button>
+            <Button onClick={handleGotoRooms} size='large' block>房间列表</Button>
+            <Button onClick={handleJoinRoom} size='large' block>扫码加入</Button>
+            <Button icon={<LogoutOutlined />} variant="filled" color="danger" onClick={handleLogout} size='large' block>退出</Button>
           </>
         ) }
       </Space>
