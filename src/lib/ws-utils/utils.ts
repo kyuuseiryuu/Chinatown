@@ -2,7 +2,10 @@ import { WebSocket } from 'ws';
 
 export type MethodHandler<T = unknown> = (payload: T, ws: WebSocket, wsMap: Map<string, WebSocket>) => void;
 export const methodRegistry = new Map<string, MethodHandler<unknown>>();
-
+enum CallType {
+  CALL_SERVER = 'call-server',
+  CALL_CLIENT = 'call-client',
+}
 export const registMethodHandler = <T>(method: string, handler: MethodHandler<T>) => {
   if (methodRegistry.has(method)) {
     console.warn(`Method ${method} is already registered. Overwriting.`);
@@ -10,12 +13,28 @@ export const registMethodHandler = <T>(method: string, handler: MethodHandler<T>
   methodRegistry.set(method, handler as MethodHandler<unknown>);
 }
 
+export const parseCallServerMessage = (msg: string) => {
+  try {
+    const data = JSON.parse(msg);
+    if (data.type === CallType.CALL_SERVER) {
+      return {
+        method: data.method,
+        payload: { ...data.payload },
+      };
+    }
+  } catch (error) {
+    console.error('Failed to parse call server message:', error);
+  }
+  return null;
+};
+
+
 export const handleMessage = (msg: string, ws: WebSocket, wsMap: Map<string, WebSocket>) => {
   console.log(msg);
   const message = parseCallServerMessage(msg);
   if (!message) {
     // Handle the parsed message
-    ws.send(callClient('function-not-found', { message }))
+    // ws.send(callClient('function-not-found', { message }))
     return;
   }
   console.log('Parsed message:', message);
@@ -32,24 +51,17 @@ export const handleWsClosed = (id: string, wsMap: Map<string, WebSocket>) => {
   console.log(`Disconnect ${id}. left links: ${wsMap.size}`);
 }
 
-export const parseCallServerMessage = (msg: string) => {
-  try {
-    const data = JSON.parse(msg);
-    if (data.type === 'call-server') {
-      return {
-        method: data.method,
-        payload: { ...data.payload },
-      };
-    }
-  } catch (error) {
-    console.error('Failed to parse call server message:', error);
-  }
-  return null;
-};
-
 export const callClient = (method: string, payload: Record<string, unknown>) => {
   return JSON.stringify({
-    type: 'call-client',
+    type: CallType.CALL_CLIENT,
+    method,
+    payload,
+  });
+}
+
+export const callServer = (method: string, payload: Record<string, unknown>) => {
+  return JSON.stringify({
+    type: CallType.CALL_SERVER,
     method,
     payload,
   });
@@ -66,6 +78,5 @@ export const invokeMethod = (
     handler(payload, ws, wsMap);
   } else {
     console.warn(`Method ${method} not found in registry.`);
-    ws.send(callClient('function-not-found', { message: `Method ${method} not found.` }));
   }
 }
