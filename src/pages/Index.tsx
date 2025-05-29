@@ -22,7 +22,7 @@ function App() {
   }, [navigator]);
 
   const handleCreateRoom = React.useCallback(async () => {
-    const newRoom = await room.createRoom?.(`${username}的房间`, username);
+    const newRoom = await room.createRoom?.(`${username} 的房间`, username);
     console.debug('创建房间:', newRoom);
     navigator(`/rooms/${newRoom?.id}`);
   }, [navigator, room, username]);

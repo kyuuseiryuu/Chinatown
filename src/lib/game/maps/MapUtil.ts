@@ -4,6 +4,7 @@ class MapUtil {
   }
 
   static makeEanbleMap(area: number[][]) {
+    console.log('makeEanbleMap', area);
   }
 }
 

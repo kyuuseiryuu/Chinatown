@@ -1,6 +1,6 @@
 import { Breadcrumb, Button, List } from 'antd';
 import { useNavigate } from 'react-router';
-import { useRoomState, type Room } from '../stores/room';
+import { useRoomState, getShortID, type Room } from '../stores/room';
 import { useCallback } from 'react';
 import { useUserState } from '../stores/user';
 import { DeleteOutlined, LoginOutlined } from '@ant-design/icons';
@@ -21,7 +21,7 @@ const RoomList = () => {
       </Breadcrumb>
       {/* <Typography.Title level={2}>房间列表</Typography.Title> */}
       <List
-        dataSource={roomState.roomList}
+        dataSource={roomState.roomList.reverse()}
         renderItem={e => (
           <List.Item
             actions={[
@@ -29,7 +29,7 @@ const RoomList = () => {
               <Button type='primary' icon={<LoginOutlined />} onClick={() => navigator(`/rooms/${e.id}`)}>加入房间</Button>,
             ]}
           >
-            <List.Item.Meta title={e.name} />
+            <List.Item.Meta title={`${e.name} (${getShortID(e.id)})`} />
           </List.Item>
         )}
       />

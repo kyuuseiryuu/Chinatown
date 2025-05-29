@@ -1,6 +1,6 @@
-import Game from "../lib/Game";
-import Player from "../lib/Player";
-import { PlayState, PlayStateChangeHandler } from "../lib/types";
+import Game from "../lib/game/Game";
+import Player from "../lib/game/Player";
+import { PlayState, PlayStateChangeHandler } from "../lib/game/types";
 
 
 const game = new Game();

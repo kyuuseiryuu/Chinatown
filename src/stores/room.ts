@@ -18,10 +18,16 @@ const getRoomId = async () => {
   return v4().toUpperCase(); // Assuming UUID is imported from a library like 'uuid'
 }
 
-export const useRoomState = create<RoomState>((set => ({
+export const getShortID = (uuid: string) => {
+  return uuid.split('-')[3];
+}
+
+export const useRoomState = create<RoomState>(((set, get) => ({
   roomList: [],
   setRoomList: (list) => set({ roomList: list }),
   createRoom: async (roomName: string, owner: string) => {
+    const room = get().roomList.filter(e => e.owner === owner);
+    if (room.length) return room[0];
     const roomId = await getRoomId();
     const newRoom: Room = { id: roomId, name: roomName, owner };
     set(state => {

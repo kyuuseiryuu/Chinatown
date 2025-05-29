@@ -1,4 +1,4 @@
-import Dealer from "../lib/Dealer";
+import Dealer from "../lib/game/Dealer";
 
 const GET_SIZE = 5;
 const LEAVE_SIZE = 3;
