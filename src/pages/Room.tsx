@@ -4,6 +4,7 @@ import { useMatch, useNavigate } from 'react-router';
 import { FireOutlined } from '@ant-design/icons';
 import { useRoomState, getShortID } from '../stores/room';
 import { useUserState } from '../stores/user';
+import BreadcrumbItem from '../components/BreadcrumbItem';
 
 const Room = () => {
   const match = useMatch('/rooms/:id');
@@ -25,11 +26,9 @@ const Room = () => {
   return (
     <div>
       <Breadcrumb style={{ marginBottom: 16 }}>
-        <Breadcrumb.Item onClick={() => navigator('/')}>首页</Breadcrumb.Item>
-        <Breadcrumb.Item onClick={() => navigator('/rooms')}>房间</Breadcrumb.Item>
-        <Breadcrumb.Item>{room?.name}</Breadcrumb.Item>
+        <BreadcrumbItem onClick={() => navigator('/')}>首页</BreadcrumbItem>
+        <BreadcrumbItem>{room?.name}</BreadcrumbItem>
       </Breadcrumb>
-      
       <Space direction="vertical" size="large" style={{ width: '100%', padding: 8 }}>
         <Typography.Title level={4}>
           <Space>

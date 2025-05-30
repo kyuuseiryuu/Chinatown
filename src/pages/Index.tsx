@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useLogto, IdTokenClaims } from '@logto/react';
 import { Avatar, Space, Typography, Button, } from 'antd';
-import { useNavigate } from 'react-router';
 import { useUserState } from '../stores/user';
-import { useRoomState } from "../stores/room";
+import RoomList from '../components/RoomList';
 import { LogoutOutlined } from '@ant-design/icons';
 
 const HOST = window.location.origin;
 
 function App() {
-  const navigator = useNavigate();
   const { isAuthenticated, getIdTokenClaims, signIn, signOut } = useLogto();
   const [user, setUser] = useState<IdTokenClaims>();
 
@@ -24,7 +22,6 @@ function App() {
     })();
   }, [getIdTokenClaims, isAuthenticated]);
   const username = useUserState(state => state.username);
-  const room = useRoomState(state => state);
   const isLogin = Boolean(isAuthenticated);
 
   const handleLogin = React.useCallback(() => {
@@ -35,16 +32,6 @@ function App() {
     useUserState.getState().setUsername('');
     signOut(HOST);
   }, [signOut]);
-
-  const handleCreateRoom = React.useCallback(async () => {
-    const newRoom = await room.createRoom?.(`${username} 的房间`, username);
-    console.debug('创建房间:', newRoom);
-    navigator(`/rooms/${newRoom?.id}`);
-  }, [navigator, room, username]);
-
-  const handleGotoRooms = React.useCallback(() => {
-    navigator('/rooms');
-  }, [navigator]);
 
   return (
     <>
@@ -60,10 +47,7 @@ function App() {
         { !isLogin ? (
           <Button onClick={handleLogin} size='large' block>登录</Button>
         ) : (
-          <>
-            <Button onClick={handleCreateRoom} size='large' block>创建房间</Button>
-            <Button onClick={handleGotoRooms} size='large' block>房间列表</Button>
-          </>
+          <RoomList />
         ) }
       </Space>
     </>
