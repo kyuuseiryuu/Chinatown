@@ -1,37 +1,41 @@
 import React, { useEffect, useState } from 'react'
-import { useLogto, IdTokenClaims } from '@logto/react';
+import { useLogto, type IdTokenClaims } from '@logto/react';
 import { Avatar, Space, Typography, Button, } from 'antd';
-import { useUserState } from '../stores/user';
-import RoomList from '../components/RoomList';
+import { useUserState } from '@/stores/user';
+import RoomList from '@/components/RoomList';
 import { LogoutOutlined } from '@ant-design/icons';
 
 const HOST = window.location.origin;
 
 function App() {
-  const { isAuthenticated, getIdTokenClaims, signIn, signOut } = useLogto();
+  const { isAuthenticated, getIdTokenClaims, signIn } = useLogto();
   const [user, setUser] = useState<IdTokenClaims>();
+
+  const isLogin = useUserState(state => state.logined);
 
   useEffect(() => {
     (async () => {
       if (isAuthenticated) {
         const claims = await getIdTokenClaims();
+        if (!claims) return;
         setUser(claims);
-        useUserState.getState().setUsername(claims?.name || '');
-        console.debug('用户信息:', claims);
+        if (!isLogin) {
+          console.debug('用户信息:', claims);
+        }
+        useUserState.getState().loginSuccess(claims);
       }
     })();
-  }, [getIdTokenClaims, isAuthenticated]);
+  }, [getIdTokenClaims, isAuthenticated, isLogin]);
   const username = useUserState(state => state.username);
-  const isLogin = Boolean(isAuthenticated);
 
   const handleLogin = React.useCallback(() => {
     signIn(`${HOST}/callback`);
   }, [signIn]);
 
   const handleLogout = React.useCallback(() => {
-    useUserState.getState().setUsername('');
-    signOut(HOST);
-  }, [signOut]);
+    useUserState.getState().logout();
+    // signOut(HOST);
+  }, []);
 
   return (
     <>

@@ -1,29 +1,33 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
-import { app } from './utils';
-import { handleMessage, callClient, handleWsOpen, handleWsClosed, registMethodHandler } from '../lib/ws-utils/utils';
-import { WebSocket } from 'ws';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import { app, userWsMap } from '../server/utils';
+import { handleMessage, handleWsClosed, createCallClient } from '../lib/ws-utils';
+import type { ClientMethods } from '@/types';
+import './handler';
+import { roomRouter } from './routers/roomRouter';
 
-const wsMap = new Map<string, WebSocket>();
+const callClient = createCallClient<ClientMethods>();
 
-registMethodHandler<{ callback?: string }>('get-uuid', (payload, ws, wsMap) => {
-  const { callback } = payload;
-  ws.send(callClient(callback ?? 'update-uuid', { uuid: uuidv4(), memberCount: wsMap.size }));
-});
+const jsonParser = bodyParser.json();
+
+app.use(cors());
 
 app.ws('/ws', (ws, req) => {
-  console.debug('Connect: ', req.hostname);
   const id = uuidv4();
-  handleWsOpen(ws);
-  wsMap.set(id, ws);
+  console.debug('Connect: ', req.hostname, id);
+  userWsMap.set(id, ws);
+  ws.send(callClient('requestLogin', { connectionId: id }));
   ws.on('message', msg => {
-    handleMessage(msg.toString(), ws, wsMap);
+    handleMessage(msg.toString(), ws);
   });
-  ws.on('close', () => handleWsClosed(id, wsMap));
+  ws.on('close', () => handleWsClosed(id, userWsMap));
 });
 
-app.use(express.static('public'))
+app.use('/', express.static('public'))
 
+app.use('/api/room', jsonParser, roomRouter);
 
 app.listen(3000, () => {
   console.debug('App start, port: 3000');

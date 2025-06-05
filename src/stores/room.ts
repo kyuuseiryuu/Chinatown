@@ -1,5 +1,6 @@
-import { v4 } from 'uuid'; // Ensure you have a UUID library installed
 import { create } from 'zustand';
+import { useUserState } from './user';
+import { instance } from '@/utils';
 
 export interface Room {
   id: string;
@@ -10,30 +11,23 @@ export interface Room {
 interface RoomState {
   roomList: Room[];
   setRoomList: (list: Room[]) => void;
-  createRoom?: (roomName: string, username: string) => Promise<Room>;
+  createRoom?: (roomName: string) => void;
   destroyRoom: (roomId: string) => Promise<void>;
 }
 
-const getRoomId = async () => {
-  return v4().toUpperCase(); // Assuming UUID is imported from a library like 'uuid'
-}
+// const callServer = createCallServer<ServerMethods>();
 
 export const getShortID = (uuid: string) => {
   return uuid.split('-')[3];
 }
 
-export const useRoomState = create<RoomState>(((set, get) => ({
+export const useRoomState = create<RoomState>(((set) => ({
   roomList: [],
   setRoomList: (list) => set({ roomList: list }),
-  createRoom: async (roomName: string, owner: string) => {
-    const room = get().roomList.filter(e => e.owner === owner);
-    if (room.length) return room[0];
-    const roomId = await getRoomId();
-    const newRoom: Room = { id: roomId, name: roomName, owner };
-    set(state => {
-      return { roomList: [...state.roomList, newRoom] };
-    });
-    return newRoom; // Return the newly created room
+  createRoom: async (roomName: string) => {
+    const { id: aud } = useUserState.getState();
+    const data = await instance.put('/room/', { aud, roomName  });
+    console.debug(data.data);
   },
   destroyRoom: async (roomId: string) => {
     const newRoomList = useRoomState

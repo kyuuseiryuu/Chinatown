@@ -6,6 +6,7 @@ import Index from './pages/Index.tsx'
 import Layout from './components/Layout.tsx'
 import Room from './pages/Room.tsx'
 import LogToCallback from './pages/LogToCallback.tsx'
+import '@/utils.ts';
 
 const router = createRouter([
   { path: '/', element: <Index />, index: true },
@@ -13,7 +14,7 @@ const router = createRouter([
   { path: '/rooms/:id', element: <Room /> },
 ]);
 
-import { LogtoProvider, LogtoConfig } from '@logto/react';
+import { LogtoProvider, type LogtoConfig } from '@logto/react';
 
 const config: LogtoConfig = {
   endpoint: 'https://logto.ksr.la/',

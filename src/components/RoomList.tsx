@@ -1,8 +1,8 @@
 import { Button, List } from 'antd';
 import { useNavigate } from 'react-router';
-import { useRoomState, getShortID, type Room } from '../stores/room';
+import { useRoomState, getShortID, type Room } from '@/stores/room';
 import { useCallback } from 'react';
-import { useUserState } from '../stores/user';
+import { useUserState } from '@/stores/user';
 import { FireOutlined, LoginOutlined } from '@ant-design/icons';
 
 
@@ -11,15 +11,14 @@ const RoomList = () => {
   const roomState = useRoomState(state => state);
   const username = useUserState(state => state.username);
   const room = useRoomState(state => state);
+
   const isMyRoom = useCallback((room: Room) => {
     return room.owner === username;
   }, [username]);
 
   const handleCreateRoom = useCallback(async () => {
-    const newRoom = await room.createRoom?.(`${username} 的房间`, username);
-    console.debug('创建房间:', newRoom);
-    navigator(`/rooms/${newRoom?.id}`);
-  }, [navigator, room, username]);
+    await room.createRoom?.(`${username} 的房间`);
+  }, [username, room]);
 
   const hasMyRoom = roomState.roomList.some(e => isMyRoom(e));
 
